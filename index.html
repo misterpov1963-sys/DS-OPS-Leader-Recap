@@ -6,7 +6,7 @@
     <title>3rd Shift Custodial Operations - Leadership Recap & Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Firebase SDK Scripts -->
+    <!-- Firebase SDK Scripts (Compat version for single-file real-time database sync) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
@@ -83,29 +83,18 @@
     </div>
 
     <script>
-        // ==========================================
-        // PASTE YOUR FIREBASE CONFIGURATION HERE
-        // ==========================================
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // Your Firebase configuration (integrated directly)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDr2_Pxyt5rSmTrLN4PIL2_OfMfdJWSs_c",
+            authDomain: "ds-ops-leader-recap.firebaseapp.com",
+            databaseURL: "https://ds-ops-leader-recap-default-rtdb.firebaseio.com",
+            projectId: "ds-ops-leader-recap",
+            storageBucket: "ds-ops-leader-recap.firebasestorage.app",
+            messagingSenderId: "919767251373",
+            appId: "1:919767251373:web:0b23fb94014336ebfe0924"
+        };
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDr2_Pxyt5rSmTrLN4PIL2_OfMfdJWSs_c",
-  authDomain: "ds-ops-leader-recap.firebaseapp.com",
-  databaseURL: "https://ds-ops-leader-recap-default-rtdb.firebaseio.com",
-  projectId: "ds-ops-leader-recap",
-  storageBucket: "ds-ops-leader-recap.firebasestorage.app",
-  messagingSenderId: "919767251373",
-  appId: "1:919767251373:web:0b23fb94014336ebfe0924"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-        // Initialize Firebase
+        // Initialize Firebase Realtime Database
         let db;
         let isFirebaseConnected = false;
         try {
@@ -113,7 +102,7 @@ const app = initializeApp(firebaseConfig);
             db = firebase.database();
             isFirebaseConnected = true;
         } catch(e) {
-            console.warn("Firebase not configured. Falling back to local storage.", e);
+            console.warn("Firebase initialization error:", e);
         }
 
         let appData = {
