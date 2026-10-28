@@ -6,7 +6,7 @@
     <title>3rd Shift Custodial Operations - Leadership Recap & Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Firebase SDK Scripts (Compat version for single-file real-time database sync) -->
+    <!-- Firebase SDK Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
@@ -83,7 +83,6 @@
     </div>
 
     <script>
-        // Your Firebase configuration (integrated directly)
         const firebaseConfig = {
             apiKey: "AIzaSyDr2_Pxyt5rSmTrLN4PIL2_OfMfdJWSs_c",
             authDomain: "ds-ops-leader-recap.firebaseapp.com",
@@ -94,7 +93,6 @@
             appId: "1:919767251373:web:0b23fb94014336ebfe0924"
         };
 
-        // Initialize Firebase Realtime Database
         let db;
         let isFirebaseConnected = false;
         try {
