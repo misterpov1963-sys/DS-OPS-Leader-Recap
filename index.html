@@ -1,11 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+const firebaseConfig = {
+  apiKey: "AIzaSyDr2_Pxyt5rSmTrLN4PIL2_OfMfdJWSs_c",
+  authDomain: "ds-ops-leader-recap.firebaseapp.com",
+  projectId: "ds-ops-leader-recap",
+  storageBucket: "ds-ops-leader-recap.firebasestorage.app",
+  messagingSenderId: "919767251373",
+  appId: "1:919767251373:web:0b23fb94014336ebfe0924"
+};
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3rd Shift Custodial Operations - Leadership Recap & Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -39,13 +50,13 @@
                     <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
                         Disney Springs 3rd Shift Operations
                     </h1>
-                    <p class="text-xs text-slate-400">Leadership Recap & Management System</p>
+                    <p class="text-xs text-slate-400">Leadership Recap & Management System (Cloud Sync Active)</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span>System Ready</span>
+                <div id="syncStatus" class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-rotate animate-spin text-amber-400"></i> <span>Connecting Cloud...</span>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
@@ -76,10 +87,34 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Saved successfully!</span>
+        <span id="toastMessage" class="text-sm font-medium">Synced successfully!</span>
     </div>
 
     <script>
+        // ==========================================
+        // PASTE YOUR FIREBASE CONFIGURATION HERE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        let db;
+        let isFirebaseConnected = false;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            isFirebaseConnected = true;
+        } catch(e) {
+            console.warn("Firebase not configured. Falling back to local storage.", e);
+        }
+
         let appData = {
             currentDate: "2026-10-28",
             activeTab: "Joint Leadership Recap",
@@ -208,8 +243,42 @@
             "Trainer on Duty"
         ];
 
+        let isRemoteUpdate = false;
+
+        function initCloudSync() {
+            if (!isFirebaseConnected) {
+                document.getElementById('syncStatus').className = "bg-rose-500/10 border border-rose-500/30 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2";
+                document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Local Mode Only</span>';
+                return;
+            }
+
+            const dbRef = db.ref('disney_3rd_shift_recap');
+            dbRef.on('value', (snapshot) => {
+                const cloudData = snapshot.val();
+                if (cloudData) {
+                    isRemoteUpdate = true;
+                    appData = cloudData;
+                    renderApp();
+                    isRemoteUpdate = false;
+                    document.getElementById('syncStatus').className = "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2";
+                    document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-cloud text-emerald-400"></i> <span>Live Sync Active</span>';
+                } else {
+                    saveData(); // Push initial data if empty
+                }
+            }, (error) => {
+                console.error("Firebase sync error:", error);
+                document.getElementById('syncStatus').className = "bg-rose-500/10 border border-rose-500/30 text-rose-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2";
+                document.getElementById('syncStatus').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Sync Error</span>';
+            });
+        }
+
         function saveData() {
-            localStorage.setItem('disney_3rd_shift_recap', JSON.stringify(appData));
+            if (isRemoteUpdate) return;
+            if (isFirebaseConnected) {
+                db.ref('disney_3rd_shift_recap').set(appData).catch(err => console.error("Save error:", err));
+            } else {
+                localStorage.setItem('disney_3rd_shift_recap', JSON.stringify(appData));
+            }
         }
 
         function renderTabs() {
@@ -347,7 +416,7 @@
                 <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="text-base font-bold text-amber-400 flex items-center gap-2">
-                            <i class="fa-solid fa-clipboard-user"></i> 2. Leadership End of Shift Logs & Detailed Comments
+                            <i class="fa-solid fa-clipboard-user"></i> 2. Leadership End of Shift Logs & Comments
                         </h3>
                         <button onclick="addLogEntry('${leader.name}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 shadow-md shadow-amber-500/20">
                             <i class="fa-solid fa-plus"></i> Add Log Entry
@@ -692,10 +761,7 @@ Content-Type: text/html; charset=UTF-8
         }
 
         window.onload = function() {
-            const saved = localStorage.getItem('disney_3rd_shift_recap');
-            if (saved) {
-                try { appData = JSON.parse(saved); } catch(e) {}
-            }
+            initCloudSync();
             renderApp();
         };
     </script>
