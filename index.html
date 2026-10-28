@@ -270,15 +270,15 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                         <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
                             <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Scheduled Labor (Hrs)</span>
-                            <input type="number" step="0.1" id="schedLabor" value="${leader.metrics.scheduled.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-white mt-1 focus:outline-none focus:border-cyan-500">
+                            <input type="number" step="0.1" id="schedLabor" value="${leader.metrics.scheduled.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-white mt-1 focus:outline-none focus:border-cyan-500">
                         </div>
                         <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
                             <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Actual Labor (Hrs)</span>
-                            <input type="number" step="0.1" id="actualLabor" value="${leader.metrics.actual.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-emerald-400 mt-1 focus:outline-none focus:border-emerald-500">
+                            <input type="number" step="0.1" id="actualLabor" value="${leader.metrics.actual.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-emerald-400 mt-1 focus:outline-none focus:border-emerald-500">
                         </div>
                         <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
                             <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Call In Factor (Hrs)</span>
-                            <input type="number" step="0.1" id="callInFactor" value="${leader.metrics.callIn.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-amber-400 mt-1 focus:outline-none focus:border-amber-500">
+                            <input type="number" step="0.1" id="callInFactor" value="${leader.metrics.callIn.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-lg font-bold text-amber-400 mt-1 focus:outline-none focus:border-amber-500">
                         </div>
                         <div class="bg-slate-950/80 border border-slate-800 p-4 rounded-xl">
                             <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Labor Variance (Hrs)</span>
@@ -482,6 +482,15 @@
             saveData();
         }
 
+        function formatDecimalInput(input) {
+            let val = parseFloat(input.value);
+            if (!isNaN(val)) {
+                input.value = val.toFixed(1);
+            } else {
+                input.value = "0.0";
+            }
+        }
+
         function syncHeadcount(leaderName) {
             const l = appData.leaders.find(x => x.name === leaderName);
             if (!l) return;
@@ -634,7 +643,7 @@
 </body>
 </html>`;
 
-            // X-Unsent: 1 instructs Outlook to open the file as a draft ready to send/edit recipients
+            // X-Unsent: 1 opens the .eml file directly in Outlook as a draft with blank To/Cc fields ready for you to select recipients normally
             const emlContent = `X-Unsent: 1
 MIME-Version: 1.0
 Date: ${new Date().toUTCString()}
