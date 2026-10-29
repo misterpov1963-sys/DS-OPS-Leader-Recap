@@ -85,7 +85,7 @@
                 {
                     name: "Joint Leadership Recap",
                     status: "Active",
-                    metrics: { scheduled: 1092.0, actual: 462.0, callIn: 112.0, variance: -630.0, variancePct: -0.5768, attendanceRate: 0.4230 },
+                    metrics: { scheduled: 1092.0, actual: 462.0, callIn: 112.0, variance: -518.0, variancePct: -0.4744, attendanceRate: 0.5256 },
                     headcount: { present: 133, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 133 },
                     logs: [
                         { leader: "Henry Powell", detail: "Joint team briefing completed. Area washdown assignments verified across Disney Springs zones." },
@@ -105,7 +105,7 @@
                 {
                     name: "Zoroaya Hernandez",
                     status: "Active",
-                    metrics: { scheduled: 152.0, actual: 159.8, callIn: 16.0, variance: 7.8, variancePct: 0.0513, attendanceRate: 1.0513 },
+                    metrics: { scheduled: 152.0, actual: 159.8, callIn: 16.0, variance: 23.8, variancePct: 0.1566, attendanceRate: 1.1566 },
                     headcount: { present: 20, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 20 },
                     logs: [
                         { leader: "Zoroaya Hernandez", detail: "Conducted pre-shift safety huddle and equipment allocation for West Side zones." },
@@ -121,7 +121,7 @@
                 {
                     name: "Henry Powell",
                     status: "Active",
-                    metrics: { scheduled: 143.0, actual: 151.0, callIn: 16.0, variance: 8.0, variancePct: 0.0559, attendanceRate: 1.0559 },
+                    metrics: { scheduled: 143.0, actual: 151.0, callIn: 16.0, variance: 24.0, variancePct: 0.1678, attendanceRate: 1.1678 },
                     headcount: { present: 19, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 19 },
                     logs: [
                         { leader: "Henry Powell", detail: "Continue catching up on my emails. Made assignment adjustments. Check RACI Chart. Updated Attendance Matrix." },
@@ -138,7 +138,7 @@
                 {
                     name: "Jonathan Jimenez",
                     status: "Active",
-                    metrics: { scheduled: 152.0, actual: 152.0, callIn: 16.0, variance: 0.0, variancePct: 0.0000, attendanceRate: 1.0000 },
+                    metrics: { scheduled: 152.0, actual: 152.0, callIn: 16.0, variance: 16.0, variancePct: 0.1053, attendanceRate: 1.1053 },
                     headcount: { present: 20, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 20 },
                     logs: [
                         { leader: "Jonathan Jimenez", detail: "Managed Marketplace area equipment deployment and chemical replenishment." }
@@ -494,9 +494,15 @@
             l.metrics.scheduled = parseFloat(document.getElementById('schedLabor').value) || 0.0;
             l.metrics.actual = parseFloat(document.getElementById('actualLabor').value) || 0.0;
             l.metrics.callIn = parseFloat(document.getElementById('callInFactor').value) || 0.0;
-            l.metrics.variance = Number((l.metrics.actual - l.metrics.scheduled).toFixed(1));
+            
+            // Corrected variance formula: (Actual + Call-In) - Scheduled
+            l.metrics.variance = Number(((l.metrics.actual + l.metrics.callIn) - l.metrics.scheduled).toFixed(1));
             l.metrics.variancePct = l.metrics.scheduled > 0 ? Number((l.metrics.variance / l.metrics.scheduled).toFixed(4)) : 0.0;
-            l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number((l.metrics.actual / l.metrics.scheduled).toFixed(4)) : 0.0;
+            l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number(((l.metrics.actual + l.metrics.callIn) / l.metrics.scheduled).toFixed(4)) : 0.0;
+            
+            document.getElementById('dispVariance').innerText = l.metrics.variance.toFixed(1);
+            document.getElementById('dispVarPct').innerText = l.metrics.variancePct.toFixed(4);
+            document.getElementById('dispAttRate').innerText = l.metrics.attendanceRate.toFixed(4);
             saveData();
         }
 
@@ -589,7 +595,6 @@
             const leader = appData.leaders.find(l => l.name === appData.activeTab) || appData.leaders[0];
             const subject = `3rd Shift Custodial Operations Recap — ${appData.currentDate} (${leader.name})`;
             
-            // Styled, colorful professional HTML body matching the dark navy web app theme with horizontal tables & cards
             let htmlBody = `
                 <html>
                 <head>
@@ -604,19 +609,19 @@
                         
                         /* Horizontal Cards for Metrics */
                         .metrics-row { display: table; width: 100%; table-layout: fixed; margin-top: 10px; }
-                        .metric-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 12px 8px; text-align: center; border-radius: 8px; }
+                        .metric-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 10px 4px; text-align: center; border-radius: 6px; }
                         .metric-card + .metric-card { border-left: none; }
-                        .card-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
-                        .card-value { font-size: 15px; font-weight: bold; color: #ffffff; }
+                        .card-label { font-size: 9px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 3px; }
+                        .card-value { font-size: 14px; font-weight: bold; color: #ffffff; }
 
                         /* Horizontal Headcount Cards */
                         .hc-row { display: table; width: 100%; table-layout: fixed; margin-top: 10px; }
-                        .hc-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 10px 6px; text-align: center; border-radius: 6px; }
+                        .hc-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 8px 4px; text-align: center; border-radius: 6px; }
 
                         ul { margin: 0; padding-left: 18px; color: #e2e8f0; font-size: 13px; line-height: 1.6; }
                         li { margin-bottom: 8px; }
 
-                        /* Training Table with Trainer -> Trainee -> Module -> Status */
+                        /* Training Table: Trainer -> Trainee -> Module -> Status */
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
                         th { background: #0b132b; color: #94a3b8; text-align: left; padding: 8px; border: 1px solid #3a506b; text-transform: uppercase; font-size: 10px; }
                         td { padding: 8px; border: 1px solid #3a506b; color: #f8fafc; }
@@ -643,7 +648,7 @@
 
                             <!-- Headcount Breakdown (Horizontal) -->
                             <div style="margin-top: 15px;">
-                                <span class="card-label" style="font-size: 11px; margin-bottom: 6px;">Cast Member Headcount Breakdown</span>
+                                <span class="card-label" style="font-size: 11px; margin-bottom: 6px;">Cast Member Headcount & Attendance Status Breakdown</span>
                                 <div class="hc-row">
                                     <div class="hc-card"><span class="card-label">Present</span><span class="card-value">${leader.headcount.present}</span></div>
                                     <div class="hc-card"><span class="card-label">Sick</span><span class="card-value" style="color: #f87171;">${leader.headcount.callSick}</span></div>
