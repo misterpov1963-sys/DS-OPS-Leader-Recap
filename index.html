@@ -85,7 +85,7 @@
                 {
                     name: "Joint Leadership Recap",
                     status: "Active",
-                    metrics: { scheduled: 1092.0, actual: 462.0, callIn: 112.0, variance: -518.0, variancePct: -0.4744, attendanceRate: 0.5256 },
+                    metrics: { scheduled: 1092.0, actual: 462.0, callIn: 112.0, variance: -630.0, variancePct: -0.5768, attendanceRate: 0.4230 },
                     headcount: { present: 133, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 133 },
                     logs: [
                         { leader: "Henry Powell", detail: "Joint team briefing completed. Area washdown assignments verified across Disney Springs zones." },
@@ -105,7 +105,7 @@
                 {
                     name: "Zoroaya Hernandez",
                     status: "Active",
-                    metrics: { scheduled: 152.0, actual: 159.8, callIn: 16.0, variance: 23.8, variancePct: 0.1566, attendanceRate: 1.1566 },
+                    metrics: { scheduled: 152.0, actual: 159.8, callIn: 16.0, variance: 7.8, variancePct: 0.0513, attendanceRate: 1.0513 },
                     headcount: { present: 20, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 20 },
                     logs: [
                         { leader: "Zoroaya Hernandez", detail: "Conducted pre-shift safety huddle and equipment allocation for West Side zones." },
@@ -121,7 +121,7 @@
                 {
                     name: "Henry Powell",
                     status: "Active",
-                    metrics: { scheduled: 143.0, actual: 151.0, callIn: 16.0, variance: 24.0, variancePct: 0.1678, attendanceRate: 1.1678 },
+                    metrics: { scheduled: 143.0, actual: 151.0, callIn: 16.0, variance: 8.0, variancePct: 0.0559, attendanceRate: 1.0559 },
                     headcount: { present: 19, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 19 },
                     logs: [
                         { leader: "Henry Powell", detail: "Continue catching up on my emails. Made assignment adjustments. Check RACI Chart. Updated Attendance Matrix." },
@@ -138,7 +138,7 @@
                 {
                     name: "Jonathan Jimenez",
                     status: "Active",
-                    metrics: { scheduled: 152.0, actual: 152.0, callIn: 16.0, variance: 16.0, variancePct: 0.1053, attendanceRate: 1.1053 },
+                    metrics: { scheduled: 152.0, actual: 152.0, callIn: 16.0, variance: 0.0, variancePct: 0.0000, attendanceRate: 1.0000 },
                     headcount: { present: 20, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 20 },
                     logs: [
                         { leader: "Jonathan Jimenez", detail: "Managed Marketplace area equipment deployment and chemical replenishment." }
@@ -495,9 +495,10 @@
             l.metrics.actual = parseFloat(document.getElementById('actualLabor').value) || 0.0;
             l.metrics.callIn = parseFloat(document.getElementById('callInFactor').value) || 0.0;
             
-            l.metrics.variance = Number(((l.metrics.actual + l.metrics.callIn) - l.metrics.scheduled).toFixed(1));
+            // Corrected variance formula: Actual - Scheduled
+            l.metrics.variance = Number((l.metrics.actual - l.metrics.scheduled).toFixed(1));
             l.metrics.variancePct = l.metrics.scheduled > 0 ? Number((l.metrics.variance / l.metrics.scheduled).toFixed(4)) : 0.0;
-            l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number(((l.metrics.actual + l.metrics.callIn) / l.metrics.scheduled).toFixed(4)) : 0.0;
+            l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number((l.metrics.actual / l.metrics.scheduled).toFixed(4)) : 0.0;
             
             document.getElementById('dispVariance').innerText = l.metrics.variance.toFixed(1);
             document.getElementById('dispVarPct').innerText = l.metrics.variancePct.toFixed(4);
@@ -620,7 +621,7 @@
                         ul { margin: 0; padding-left: 18px; color: #e2e8f0; font-size: 13px; line-height: 1.6; }
                         li { margin-bottom: 8px; }
 
-                        /* Stylish Contract Cards (Brackets / Text Boxes) */
+                        /* Polished Contract Boxes / Brackets */
                         .contract-card { background: #0b132b; border: 1px solid #3a506b; border-radius: 10px; padding: 16px; margin-bottom: 14px; }
                         .contract-title { font-size: 13px; font-weight: bold; color: #48cae4; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; }
                         .contract-desc { background: #1c2541; border: 1px solid #48cae4; border-radius: 8px; padding: 12px; font-size: 13px; color: #f8fafc; line-height: 1.6; }
@@ -683,7 +684,7 @@
                             </table>
                         </div>
 
-                        <!-- 4. Specialized Contracts & Status (Styled Contract Boxes) -->
+                        <!-- 4. Specialized Contracts & Status (Styled Boxes) -->
                         <div class="section" style="border-bottom: none;">
                             <h3>4. Specialized Contracts & Work Completed</h3>
                             <div style="margin-top: 10px;">
