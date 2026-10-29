@@ -495,7 +495,7 @@
             l.metrics.actual = parseFloat(document.getElementById('actualLabor').value) || 0.0;
             l.metrics.callIn = parseFloat(document.getElementById('callInFactor').value) || 0.0;
             
-            // Corrected variance formula: Actual - Scheduled
+            // Correct variance formula: Actual - Scheduled
             l.metrics.variance = Number((l.metrics.actual - l.metrics.scheduled).toFixed(1));
             l.metrics.variancePct = l.metrics.scheduled > 0 ? Number((l.metrics.variance / l.metrics.scheduled).toFixed(4)) : 0.0;
             l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number((l.metrics.actual / l.metrics.scheduled).toFixed(4)) : 0.0;
