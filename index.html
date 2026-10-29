@@ -77,7 +77,7 @@
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
         let appData = {
-            currentDate: "2026-10-29",
+            currentDate: new Date().toISOString().split('T')[0],
             activeTab: "Joint Leadership Recap",
             leaders: [
                 {
@@ -94,10 +94,10 @@
                         { trainer: "Henry Powell", trainee: "Team Lead", module: "Night 1 Facilitation", n1: 1, n2: 1, n3: 1, assessment: "Passed - Certified" }
                     ],
                     contracts: [
-                        { name: "Kings Projects", lead: "Henry Powell", status: "Completed", scope: "Scrub the Floor in WOD Male, Lime Garage and Uniqlo Guest RR" },
-                        { name: "Kings Carpet Cleaning", lead: "Henry Powell", status: "Completed", scope: "CIRQUE CURTAINS" },
-                        { name: "Kings Building Fronts", lead: "Henry Powell", status: "Completed", scope: "CIRQUE, WATERMELON LOT SIDE" },
-                        { name: "KSI Waterway cleaning", lead: "Henry Powell", status: "Completed", scope: "STK FOUNTAIN, ARCHIMEDES, 4 Ponds Net/ Vacuum Springs" }
+                        { name: "Kings Projects", lead: "Henry Powell", workDone: "Scrub the Floor in WOD Male, Lime Garage and Uniqlo Guest RR" },
+                        { name: "Kings Carpet Cleaning", lead: "Henry Powell", workDone: "CIRQUE CURTAINS" },
+                        { name: "Kings Building Fronts", lead: "Henry Powell", workDone: "CIRQUE, WATERMELON LOT SIDE" },
+                        { name: "KSI Waterway cleaning", lead: "Henry Powell", workDone: "STK FOUNTAIN, ARCHIMEDES, 4 Ponds Net/ Vacuum Springs" }
                     ]
                 },
                 {
@@ -113,7 +113,7 @@
                         { trainer: "Zoroaya", trainee: "Trainee A", module: "Pressure washing", n1: 1, n2: 1, n3: 0, assessment: "Needs Remediation" }
                     ],
                     contracts: [
-                        { name: "West Side Deep Clean", lead: "Zoroaya Hernandez", status: "Completed", scope: "Town Center concourse washdown and gum removal." }
+                        { name: "West Side Deep Clean", lead: "Zoroaya Hernandez", workDone: "Town Center concourse washdown and gum removal." }
                     ]
                 },
                 {
@@ -123,18 +123,14 @@
                     headcount: { present: 19, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 19 },
                     logs: [
                         { leader: "Henry Powell", detail: "Continue catching up on my emails. Made assignment adjustments. Check RACI Chart. Updated Attendance Matrix." },
-                        { leader: "Henry Powell", detail: "Check on the contracts, Checked the casts and the property for safety and show quality." },
-                        { leader: "Henry Powell", detail: "Completely rebuilt the calendar for BF and KSI. Cloud-based sync & cascading task management active." },
-                        { leader: "Henry Powell", detail: "Completely rebuilt the attendance tracker matrix." }
+                        { leader: "Henry Powell", detail: "Check on the contracts, Checked the casts and the property for safety and show quality." }
                     ],
                     training: [
                         { trainer: "Raul", trainee: "Jovi", module: "Area Washdown", n1: 0, n2: 0, n3: 0, assessment: "Pending Evaluation" }
                     ],
                     contracts: [
-                        { name: "Kings Projects", lead: "Henry Powell", status: "Completed", scope: "Scrub the Floor in WOD Male, Lime Garage and Uniqlo Guest RR" },
-                        { name: "Kings Carpet Cleaning", lead: "Henry Powell", status: "Completed", scope: "CIRQUE CURTAINS" },
-                        { name: "Kings Building Fronts", lead: "Henry Powell", status: "Completed", scope: "CIRQUE, WATERMELON LOT SIDE" },
-                        { name: "KSI Waterway cleaning", lead: "Henry Powell", status: "Completed", scope: "STK FOUNTAIN, ARCHIMEDES, 4 Ponds Net/ Vacuum Springs" }
+                        { name: "Kings Projects", lead: "Henry Powell", workDone: "Scrub the Floor in WOD Male, Lime Garage and Uniqlo Guest RR" },
+                        { name: "Kings Carpet Cleaning", lead: "Henry Powell", workDone: "CIRQUE CURTAINS" }
                     ]
                 },
                 {
@@ -146,7 +142,7 @@
                         { leader: "Jonathan Jimenez", detail: "Managed Marketplace area equipment deployment and chemical replenishment." }
                     ],
                     training: [{ trainer: "Jonathan", trainee: "Trainee B", module: "Area Washdown", n1: 1, n2: 1, n3: 1, assessment: "Passed - Certified" }],
-                    contracts: [{ name: "Marketplace Washdown", lead: "Jonathan Jimenez", status: "Completed", scope: "World of Disney perimeter pressure washing." }]
+                    contracts: [{ name: "Marketplace Washdown", lead: "Jonathan Jimenez", workDone: "World of Disney perimeter pressure washing." }]
                 },
                 {
                     name: "Cheryl Moore",
@@ -173,7 +169,7 @@
                     headcount: { present: 22, callSick: 0, fmla: 0, ado: 0, er: 0, ros: 0, late: 0, totalSched: 22 },
                     logs: [{ leader: "Roxanne Canales", detail: "Covering overnight duty for alternate zone support." }],
                     training: [],
-                    contracts: [{ name: "Overnight Support", lead: "Roxanne Canales", status: "Completed", scope: "Backfill leadership for East Side." }]
+                    contracts: [{ name: "Overnight Support", lead: "Roxanne Canales", workDone: "Backfill leadership for East Side." }]
                 },
                 {
                     name: "Michael Rivera",
@@ -304,15 +300,8 @@
 
                 let contractsHtml = leader.contracts.map((c, idx) => `
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div class="w-full md:w-1/4"><input type="text" value="${c.name}" oninput="updateContract('${leader.name}', ${idx}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-bold text-white"></div>
-                        <div class="w-full md:w-1/5"><input type="text" value="${c.lead}" oninput="updateContract('${leader.name}', ${idx}, 'lead', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
-                        <div class="w-full md:w-36">
-                            <select onchange="updateContract('${leader.name}', ${idx}, 'status', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-semibold text-emerald-400">
-                                <option value="Completed" ${c.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                                <option value="In Progress" ${c.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                            </select>
-                        </div>
-                        <div class="w-full grow"><input type="text" value="${c.scope}" oninput="updateContract('${leader.name}', ${idx}, 'scope', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
+                        <div class="w-full md:w-1/3"><input type="text" value="${c.name}" oninput="updateContract('${leader.name}', ${idx}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-bold text-white"></div>
+                        <div class="w-full grow"><input type="text" value="${c.workDone}" oninput="updateContract('${leader.name}', ${idx}, 'workDone', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
                         <button onclick="deleteContract('${leader.name}', ${idx})" class="text-slate-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `).join('');
@@ -346,15 +335,15 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <span class="text-[11px] font-semibold text-slate-400 block">Scheduled Labor (Hrs)</span>
-                                <input type="number" step="0.1" id="schedLabor" value="${leader.metrics.scheduled.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-white mt-1">
+                                <input type="number" step="0.1" id="schedLabor" value="${leader.metrics.scheduled.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-white mt-1">
                             </div>
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <span class="text-[11px] font-semibold text-slate-400 block">Actual Labor (Hrs)</span>
-                                <input type="number" step="0.1" id="actualLabor" value="${leader.metrics.actual.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-emerald-400 mt-1">
+                                <input type="number" step="0.1" id="actualLabor" value="${leader.metrics.actual.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-emerald-400 mt-1">
                             </div>
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <span class="text-[11px] font-semibold text-slate-400 block">Call In Factor (Hrs)</span>
-                                <input type="number" step="0.1" id="callInFactor" value="${leader.metrics.callIn.toFixed(1)}" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-amber-400 mt-1">
+                                <input type="number" step="0.1" id="callInFactor" value="${leader.metrics.callIn.toFixed(1)}" onblur="formatDecimalInput(this)" oninput="syncMetrics('${leader.name}')" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-lg font-bold text-amber-400 mt-1">
                             </div>
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
                                 <span class="text-[11px] font-semibold text-slate-400 block">Labor Variance</span>
@@ -406,20 +395,30 @@
                     <!-- 4. Contracts -->
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-base font-bold text-emerald-400"><i class="fa-solid fa-file-contract"></i> 4. Specialized Contracts</h3>
+                            <h3 class="text-base font-bold text-emerald-400"><i class="fa-solid fa-file-contract"></i> 4. Specialized Contracts & Work Completed</h3>
                             <button onclick="addContract('${leader.name}')" class="bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-lg text-xs"><i class="fa-solid fa-plus"></i> Add Contract</button>
                         </div>
                         <div class="space-y-3">${contractsHtml}</div>
                     </div>
                 `;
 
-                // Live dynamic date display (today: 2026-10-29)
+                // Live dynamic date display
                 const todayStr = new Date().toISOString().split('T')[0];
                 appData.currentDate = todayStr;
                 document.getElementById('currentDateDisplay').innerText = todayStr;
             } catch(err) {
                 console.error("Render error:", err);
             }
+        }
+
+        function formatDecimalInput(input) {
+            let val = parseFloat(input.value);
+            if (!isNaN(val)) {
+                input.value = val.toFixed(1);
+            } else {
+                input.value = "0.0";
+            }
+            syncMetrics(appData.activeTab);
         }
 
         function updateLeaderStatus(leaderName, status) {
@@ -491,7 +490,7 @@
 
         function addContract(leaderName) {
             const l = appData.leaders.find(x => x.name === leaderName);
-            if (l) l.contracts.push({ name: "Task", lead: leaderName, status: "In Progress", scope: "Scope..." });
+            if (l) l.contracts.push({ name: "Contract Task", workDone: "Work completed..." });
             saveData();
             renderApp();
         }
