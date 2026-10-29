@@ -44,8 +44,8 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <div id="syncIndicator" class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="syncText">Live Synced Across PCs</span>
+                <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span>Locally Saved & Secure</span>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
@@ -69,14 +69,13 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Synced successfully!</span>
+        <span id="toastMessage" class="text-sm font-medium">Saved locally!</span>
     </div>
 
     <script>
-        const BIN_ID = "66f42c3ead19ca34f8a1924b"; 
-        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const STORAGE_KEY = "disney_3rd_shift_recap_data_v2";
 
-        let appData = {
+        const defaultData = {
             currentDate: new Date().toISOString().split('T')[0],
             activeTab: "Joint Leadership Recap",
             leaders: [
@@ -183,47 +182,35 @@
             ]
         };
 
-        const activeLeadersList = ["Henry Powell", "Zoroaya Hernandez", "Jonathan Jimenez", "Cheryl Moore", "Sabine Bade", "Roxanne Canales", "Michael Rivera"];
-        const trainingModulesList = ["Area Washdown", "Pressure washing", "Night 1 Facilitation", "Trainer on Duty"];
+        let appData = loadData();
 
-        let isSaving = false;
-        let lastStateHash = "";
-
-        async function fetchSharedData() {
-            if (isSaving) return;
+        function loadData() {
             try {
-                const response = await fetch(API_URL, { headers: { "X-Master-Key": "$2a$10$Xb7vL5mN8q1v2z3w4k5l6O" } });
-                if (response.ok) {
-                    const result = await response.json();
-                    const remoteData = result.record;
-                    if (remoteData && remoteData.leaders) {
-                        const hash = JSON.stringify(remoteData);
-                        if (hash !== lastStateHash) {
-                            appData = remoteData;
-                            lastStateHash = hash;
-                            renderApp();
-                        }
-                    }
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    return JSON.parse(saved);
                 }
+            } catch (e) {}
+            return defaultData;
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+                showToast();
             } catch (e) {}
         }
 
-        async function saveData() {
-            isSaving = true;
-            const hash = JSON.stringify(appData);
-            lastStateHash = hash;
-            try {
-                await fetch(API_URL, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$Xb7vL5mN8q1v2z3w4k5l6O' },
-                    body: JSON.stringify(appData)
-                });
-                document.getElementById('syncText').innerText = "Live Synced Across PCs";
-            } catch (e) {
-                document.getElementById('syncText').innerText = "Save Error";
-            }
-            setTimeout(() => { isSaving = false; }, 300);
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 1500);
         }
+
+        const activeLeadersList = ["Henry Powell", "Zoroaya Hernandez", "Jonathan Jimenez", "Cheryl Moore", "Sabine Bade", "Roxanne Canales", "Michael Rivera"];
+        const trainingModulesList = ["Area Washdown", "Pressure washing", "Night 1 Facilitation", "Trainer on Duty"];
 
         function renderTabs() {
             const container = document.getElementById('leaderTabs');
@@ -241,7 +228,6 @@
                 btn.onclick = () => {
                     appData.activeTab = leader.name;
                     renderApp();
-                    saveData();
                 };
                 container.appendChild(btn);
             });
@@ -445,7 +431,6 @@
                     </div>
                 `;
 
-                // Live dynamic date display
                 const todayStr = new Date().toISOString().split('T')[0];
                 appData.currentDate = todayStr;
                 document.getElementById('currentDateDisplay').innerText = todayStr;
@@ -496,7 +481,6 @@
             l.headcount.ros = parseInt(document.getElementById('hcRos').value) || 0;
             l.headcount.late = parseInt(document.getElementById('hcLate').value) || 0;
 
-            // Total scheduled = present + callOuts (sick, fmla, ado). ER, ROS, Late are already present on site.
             l.headcount.totalSched = l.headcount.present + l.headcount.callSick + l.headcount.fmla + l.headcount.ado;
             document.getElementById('dispTotalSched').innerText = l.headcount.totalSched;
             saveData();
@@ -582,10 +566,8 @@
             a.click();
         }
 
-        window.onload = async function() {
-            await fetchSharedData();
+        window.onload = function() {
             renderApp();
-            setInterval(fetchSharedData, 2000);
         };
     </script>
 </body>
