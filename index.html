@@ -48,10 +48,10 @@
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
                     <span id="currentDateDisplay" class="font-medium text-slate-200"></span>
                 </div>
-                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save a backup file of your current data">
+                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save backup file">
                     <i class="fa-solid fa-download"></i> Save Backup
                 </button>
-                <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load a saved backup file">
+                <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load backup file">
                     <i class="fa-solid fa-upload"></i> Load Backup <input type="file" id="importFile" onchange="importBackup(event)" class="hidden" accept=".json">
                 </label>
                 <button onclick="downloadEmlFile()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
@@ -588,14 +588,64 @@
         function downloadEmlFile() {
             const leader = appData.leaders.find(l => l.name === appData.activeTab) || appData.leaders[0];
             const subject = `3rd Shift Custodial Operations Recap — ${appData.currentDate} (${leader.name})`;
-            let htmlBody = `<!DOCTYPE html><html><body><h2>${leader.name} Recap</h2></body></html>`;
-            const emlContent = `X-Unsent: 1\nMIME-Version: 1.0\nSubject: ${subject}\nContent-Type: text/html; charset=UTF-8\n\n` + htmlBody;
+            
+            let htmlBody = `
+                <html>
+                <body style="font-family: Arial, sans-serif; color: #333; background-color: #f8fafc; padding: 20px;">
+                    <div style="max-width: 600px; background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <h2 style="color: #1c2541; margin-top: 0;">Disney Springs 3rd Shift Operations Recap</h2>
+                        <p><strong>Leader:</strong> ${leader.name}</p>
+                        <p><strong>Status:</strong> ${leader.status}</p>
+                        <p><strong>Date:</strong> ${appData.currentDate}</p>
+                        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+                        
+                        <h3 style="color: #3a506b;">Labor & Attendance Metrics</h3>
+                        <ul>
+                            <li>Scheduled Labor: ${leader.metrics.scheduled.toFixed(1)} hrs</li>
+                            <li>Actual Labor: ${leader.metrics.actual.toFixed(1)} hrs</li>
+                            <li>Call-In Factor: ${leader.metrics.callIn.toFixed(1)} hrs</li>
+                            <li>Variance: ${leader.metrics.variance.toFixed(1)} hrs</li>
+                            <li>Attendance Rate: ${(leader.metrics.attendanceRate * 100).toFixed(1)}%</li>
+                        </ul>
+
+                        <h3 style="color: #3a506b;">Shift Activity Logs</h3>
+                        <ul>
+                            ${leader.logs.map(l => `<li><strong>${l.leader}:</strong> ${l.detail}</li>`).join('')}
+                        </ul>
+
+                        <h3 style="color: #3a506b;">Contracts & Work Completed</h3>
+                        <ul>
+                            ${leader.contracts.map(c => `<li><strong>${c.name}:</strong> ${c.workDone}</li>`).join('')}
+                        </ul>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const boundary = "----=_Part_" + Date.now();
+            const emlContent = `To: Team <recap@disney.com>\n` +
+                             `Subject: ${subject}\n` +
+                             `MIME-Version: 1.0\n` +
+                             `Content-Type: multipart/alternative; boundary="${boundary}"\n\n` +
+                             `--${boundary}\n` +
+                             `Content-Type: text/plain; charset=UTF-8\n` +
+                             `Content-Transfer-Encoding: 7bit\n\n` +
+                             `Disney Springs 3rd Shift Recap for ${leader.name} on ${appData.currentDate}.\n\n` +
+                             `--${boundary}\n` +
+                             `Content-Type: text/html; charset=UTF-8\n` +
+                             `Content-Transfer-Encoding: 7bit\n\n` +
+                             htmlBody + `\n\n` +
+                             `--${boundary}--`;
+
             const blob = new Blob([emlContent], { type: 'message/rfc822' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Recap_${leader.name}.eml`;
+            a.download = `Recap_${leader.name.replace(/\s+/g, '_')}_${appData.currentDate}.eml`;
+            document.body.appendChild(a);
             a.click();
+            a.remove();
+            showToast("EML File downloaded!");
         }
 
         window.onload = function() {
