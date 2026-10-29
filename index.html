@@ -250,11 +250,12 @@
                                 ${trainingModulesList.map(mod => `<option value="${mod}" ${t.module === mod ? 'selected' : ''}>${mod}</option>`).join('')}
                             </select>
                         </td>
-                        <td class="p-3 text-center"><input type="checkbox" ${t.n1 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n1', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600"></td>
-                        <td class="p-3 text-center"><input type="checkbox" ${t.n2 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n2', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600"></td>
-                        <td class="p-3 text-center"><input type="checkbox" ${t.n3 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n3', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600"></td>
+                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 1</label><input type="checkbox" ${t.n1 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n1', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
+                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 2</label><input type="checkbox" ${t.n2 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n2', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
+                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 3</label><input type="checkbox" ${t.n3 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n3', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
                         <td class="p-3">
-                            <select onchange="updateTraining('${leader.name}', ${idx}, 'assessment', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 w-full text-xs font-semibold text-amber-400">
+                            <label class="text-[11px] text-slate-400 block mb-1">Assessment</label>
+                            <select onchange="updateTraining('${leader.name}', ${idx}, 'assessment', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-xs font-semibold text-amber-400">
                                 <option value="Pending Evaluation" ${t.assessment === 'Pending Evaluation' ? 'selected' : ''}>Pending Evaluation</option>
                                 <option value="Passed - Certified" ${t.assessment === 'Passed - Certified' ? 'selected' : ''}>Passed - Certified</option>
                                 <option value="Needs Remediation" ${t.assessment === 'Needs Remediation' ? 'selected' : ''}>Needs Remediation</option>
@@ -346,6 +347,18 @@
                             <button onclick="addTraining('${leader.name}')" class="bg-purple-600 text-white font-semibold px-3 py-1.5 rounded-lg text-xs"><i class="fa-solid fa-plus"></i> Add Training</button>
                         </div>
                         <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+                                <tr>
+                                    <th class="p-3">Trainer</th>
+                                    <th class="p-3">Trainee</th>
+                                    <th class="p-3">Training Module</th>
+                                    <th class="p-3 text-center">Night 1</th>
+                                    <th class="p-3 text-center">Night 2</th>
+                                    <th class="p-3 text-center">Night 3</th>
+                                    <th class="p-3">Assessment</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
                             <tbody class="divide-y divide-slate-800">${trainingHtml}</tbody>
                         </table>
                     </div>
