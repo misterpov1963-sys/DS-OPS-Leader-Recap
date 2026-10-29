@@ -593,8 +593,8 @@
                 <html>
                 <head>
                     <style>
-                        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0b132b; color: #f8fafc; margin: 0; padding: 20px; }
-                        .container { max-width: 680px; margin: 0 auto; background: #1c2541; border-radius: 16px; border: 1px solid #3a506b; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+                        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0b132b; color: #f8fafc; margin: 0; padding: 20px; text-align: left; }
+                        .container { max-width: 680px; margin: 0; background: #1c2541; border-radius: 16px; border: 1px solid #3a506b; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: left; }
                         .header { background: linear-gradient(135deg, #3a506b, #1c2541); padding: 24px; border-bottom: 1px solid #3a506b; }
                         .header h2 { color: #48cae4; margin: 0 0 6px 0; font-size: 22px; }
                         .header p { color: #94a3b8; margin: 0; font-size: 13px; }
@@ -640,7 +640,6 @@
             `;
 
             const boundary = "----=_Part_" + Date.now();
-            // Explicitly leave To: and Cc: completely blank so Outlook provides empty text fields for manual input
             const emlContent = `X-Unsent: 1\n` +
                              `To: \n` +
                              `Cc: \n` +
@@ -665,7 +664,7 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-            showToast("EML File downloaded with open To/Cc lines!");
+            showToast("EML File downloaded successfully!");
         }
 
         window.onload = function() {
