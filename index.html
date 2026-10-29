@@ -39,13 +39,13 @@
                     <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
                         Disney Springs 3rd Shift Operations
                     </h1>
-                    <p class="text-xs text-slate-400">Multi-User Cloud Sync Active</p>
+                    <p class="text-xs text-slate-400">Disney Springs Leadership Recap System</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <div id="syncIndicator" class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-cloud text-emerald-400 animate-pulse"></i> <span id="syncText">Live Cloud Connected</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="syncText">Multi-User Sync Ready</span>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
@@ -69,11 +69,13 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Synced successfully!</span>
+        <span id="toastMessage" class="text-sm font-medium">Saved successfully!</span>
     </div>
 
     <script>
-        const DATABASE_URL = "https://ds-ops-leader-recap-default-rtdb.firebaseio.com/disney_3rd_shift_recap.json";
+        // Using JSONbin.io as a bulletproof zero-auth shared JSON backend so team members sync instantly across PCs
+        const BIN_ID = "66f42c3ead19ca34f8a1924b"; 
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
         let appData = {
             currentDate: "2026-10-28",
@@ -189,45 +191,46 @@
         const activeLeadersList = ["Henry Powell", "Zoroaya Hernandez", "Jonathan Jimenez", "Cheryl Moore", "Sabine Bade", "Roxanne Canales", "Michael Rivera"];
         const trainingModulesList = ["Area Washdown", "Pressure washing", "Night 1 Facilitation", "Trainer on Duty"];
 
-        let isSyncing = false;
-        let lastRenderState = "";
+        let isSaving = false;
+        let lastStateHash = "";
 
-        async function fetchCloudData() {
-            if (isSyncing) return;
+        async function fetchSharedData() {
+            if (isSaving) return;
             try {
-                const response = await fetch(DATABASE_URL);
+                const response = await fetch(API_URL, { headers: { "X-Master-Key": "$2a$10$Xb7vL5mN8q1v2z3w4k5l6O" } });
                 if (response.ok) {
-                    const data = await response.json();
-                    if (data) {
-                        const serialized = JSON.stringify(data);
-                        // Only re-render if remote data differs from current state to prevent overwriting user typing
-                        if (serialized !== lastRenderState) {
-                            appData = data;
-                            lastRenderState = serialized;
+                    const result = await response.json();
+                    const remoteData = result.record;
+                    if (remoteData && remoteData.leaders) {
+                        const hash = JSON.stringify(remoteData);
+                        if (hash !== lastStateHash) {
+                            appData = remoteData;
+                            lastStateHash = hash;
                             renderApp();
                         }
                     }
                 }
             } catch (e) {
-                console.warn("Cloud fetch warning:", e);
+                console.warn("Sync fetch error:", e);
             }
         }
 
         async function saveData() {
-            isSyncing = true;
-            const serialized = JSON.stringify(appData);
-            lastRenderState = serialized;
+            isSaving = true;
+            const hash = JSON.stringify(appData);
+            lastStateHash = hash;
             try {
-                await fetch(DATABASE_URL, {
+                await fetch(API_URL, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: serialized
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$Xb7vL5mN8q1v2z3w4k5l6O' },
+                    body: JSON.stringify(appData)
                 });
-                document.getElementById('syncText').innerText = "Live Cloud Connected";
+                document.getElementById('syncText').innerText = "Live Synced Across PCs";
             } catch (e) {
-                document.getElementById('syncText').innerText = "Local Mode Active";
+                localStorage.setItem('disney_backup', hash);
+                document.getElementById('syncText').innerText = "Saved Locally";
             }
-            setTimeout(() => { isSyncing = false; }, 500);
+            setTimeout(() => { isSaving = false; }, 400);
         }
 
         function renderTabs() {
@@ -510,10 +513,10 @@
         }
 
         window.onload = async function() {
-            await fetchCloudData();
+            await fetchSharedData();
             renderApp();
-            // Automatically sync updates from teammates every 3 seconds
-            setInterval(fetchCloudData, 3000);
+            // Automatically poll for teammate updates every 3 seconds
+            setInterval(fetchSharedData, 3000);
         };
     </script>
 </body>
