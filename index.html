@@ -48,11 +48,17 @@
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
                     <span id="currentDateDisplay" class="font-medium text-slate-200"></span>
                 </div>
-                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save backup file to share with team">
+                <button onclick="copyTeamData()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-cyan-600/20" title="Copy shift data to share with team">
+                    <i class="fa-solid fa-copy"></i> Copy Team Data
+                </button>
+                <button onclick="pasteTeamData()" class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-teal-600/20" title="Paste shift data from teammate">
+                    <i class="fa-solid fa-paste"></i> Paste Team Data
+                </button>
+                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save backup file">
                     <i class="fa-solid fa-download"></i> Save Backup
                 </button>
-                <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load backup file from teammate">
-                    <i class="fa-solid fa-upload"></i> Restore Backup <input type="file" id="importFile" onchange="importBackup(event)" class="hidden" accept=".json">
+                <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load backup file">
+                    <i class="fa-solid fa-upload"></i> Restore <input type="file" id="importFile" onchange="importBackup(event)" class="hidden" accept=".json">
                 </label>
                 <button onclick="downloadEmlFile()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
                     <i class="fa-solid fa-file-arrow-down"></i> .EML File
@@ -202,6 +208,40 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
                 showToast("Saved locally!");
             } catch (e) {}
+        }
+
+        async function copyTeamData() {
+            try {
+                const dataString = JSON.stringify(appData);
+                await navigator.clipboard.writeText(dataString);
+                showToast("Team data copied to clipboard!");
+            } catch (e) {
+                prompt("Copy this team data code:", JSON.stringify(appData));
+            }
+        }
+
+        async function pasteTeamData() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    appData = JSON.parse(text);
+                    saveData();
+                    renderApp();
+                    showToast("Team data loaded successfully!");
+                    return;
+                }
+            } catch (e) {}
+            const manualText = prompt("Paste your team data code here:");
+            if (manualText) {
+                try {
+                    appData = JSON.parse(manualText);
+                    saveData();
+                    renderApp();
+                    showToast("Team data loaded successfully!");
+                } catch (err) {
+                    alert("Invalid team data code.");
+                }
+            }
         }
 
         function exportBackup() {
