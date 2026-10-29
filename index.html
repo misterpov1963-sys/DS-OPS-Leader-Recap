@@ -640,8 +640,9 @@
             `;
 
             const boundary = "----=_Part_" + Date.now();
-            // Left To: and Cc: blank/open for manual recipient entry while pre-filling Subject and Body
-            const emlContent = `To: \n` +
+            // Explicitly leave To: and Cc: completely blank so Outlook provides empty text fields for manual input
+            const emlContent = `X-Unsent: 1\n` +
+                             `To: \n` +
                              `Cc: \n` +
                              `Subject: ${subject}\n` +
                              `MIME-Version: 1.0\n` +
@@ -664,7 +665,7 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-            showToast("EML File downloaded with open To/Cc fields!");
+            showToast("EML File downloaded with open To/Cc lines!");
         }
 
         window.onload = function() {
