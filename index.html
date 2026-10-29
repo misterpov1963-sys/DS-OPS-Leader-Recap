@@ -589,34 +589,52 @@
             const leader = appData.leaders.find(l => l.name === appData.activeTab) || appData.leaders[0];
             const subject = `3rd Shift Custodial Operations Recap — ${appData.currentDate} (${leader.name})`;
             
+            // Styled, colorful professional HTML body matching the dark navy web app theme
             let htmlBody = `
                 <html>
-                <body style="font-family: Arial, sans-serif; color: #333; background-color: #f8fafc; padding: 20px;">
-                    <div style="max-width: 600px; background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                        <h2 style="color: #1c2541; margin-top: 0;">Disney Springs 3rd Shift Operations Recap</h2>
-                        <p><strong>Leader:</strong> ${leader.name}</p>
-                        <p><strong>Status:</strong> ${leader.status}</p>
-                        <p><strong>Date:</strong> ${appData.currentDate}</p>
-                        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-                        
-                        <h3 style="color: #3a506b;">Labor & Attendance Metrics</h3>
-                        <ul>
-                            <li>Scheduled Labor: ${leader.metrics.scheduled.toFixed(1)} hrs</li>
-                            <li>Actual Labor: ${leader.metrics.actual.toFixed(1)} hrs</li>
-                            <li>Call-In Factor: ${leader.metrics.callIn.toFixed(1)} hrs</li>
-                            <li>Variance: ${leader.metrics.variance.toFixed(1)} hrs</li>
-                            <li>Attendance Rate: ${(leader.metrics.attendanceRate * 100).toFixed(1)}%</li>
-                        </ul>
-
-                        <h3 style="color: #3a506b;">Shift Activity Logs</h3>
-                        <ul>
-                            ${leader.logs.map(l => `<li><strong>${l.leader}:</strong> ${l.detail}</li>`).join('')}
-                        </ul>
-
-                        <h3 style="color: #3a506b;">Contracts & Work Completed</h3>
-                        <ul>
-                            ${leader.contracts.map(c => `<li><strong>${c.name}:</strong> ${c.workDone}</li>`).join('')}
-                        </ul>
+                <head>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0b132b; color: #f8fafc; margin: 0; padding: 20px; }
+                        .container { max-width: 680px; margin: 0 auto; background: #1c2541; border-radius: 16px; border: 1px solid #3a506b; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+                        .header { background: linear-gradient(135deg, #3a506b, #1c2541); padding: 24px; border-bottom: 1px solid #3a506b; }
+                        .header h2 { color: #48cae4; margin: 0 0 6px 0; font-size: 22px; }
+                        .header p { color: #94a3b8; margin: 0; font-size: 13px; }
+                        .section { padding: 20px 24px; border-bottom: 1px solid #3a506b; }
+                        .section h3 { color: #ffb703; font-size: 15px; margin-top: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+                        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
+                        .card { background: #0b132b; border: 1px solid #3a506b; border-radius: 10px; padding: 12px; text-align: center; }
+                        .card-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
+                        .card-value { font-size: 16px; font-weight: bold; color: #ffffff; }
+                        ul { margin: 0; padding-left: 18px; color: #e2e8f0; font-size: 13px; line-height: 1.6; }
+                        li { margin-bottom: 8px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>Disney Springs 3rd Shift Operations</h2>
+                            <p>Leader Recap & Shift Report — <strong>${leader.name}</strong> (${appData.currentDate})</p>
+                        </div>
+                        <div class="section">
+                            <h3>Labor & Attendance Metrics</h3>
+                            <div class="grid">
+                                <div class="card"><span class="card-label">Scheduled</span><span class="card-value">${leader.metrics.scheduled.toFixed(1)} hrs</span></div>
+                                <div class="card"><span class="card-label">Actual</span><span class="card-value" style="color: #34d399;">${leader.metrics.actual.toFixed(1)} hrs</span></div>
+                                <div class="card"><span class="card-label">Variance</span><span class="card-value" style="color: #818cf8;">${leader.metrics.variance.toFixed(1)} hrs</span></div>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3>Shift Activity Logs</h3>
+                            <ul>
+                                ${leader.logs.map(l => `<li><strong>${l.leader}:</strong> ${l.detail}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="section" style="border-bottom: none;">
+                            <h3>Specialized Contracts & Work Completed</h3>
+                            <ul>
+                                ${leader.contracts.map(c => `<li><strong>${c.name} (${c.lead}):</strong> ${c.workDone}</li>`).join('')}
+                            </ul>
+                        </div>
                     </div>
                 </body>
                 </html>
@@ -645,7 +663,7 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-            showToast("EML File downloaded!");
+            showToast("Styled EML File downloaded!");
         }
 
         window.onload = function() {
