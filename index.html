@@ -589,6 +589,7 @@
             const leader = appData.leaders.find(l => l.name === appData.activeTab) || appData.leaders[0];
             const subject = `3rd Shift Custodial Operations Recap — ${appData.currentDate} (${leader.name})`;
             
+            // Styled, colorful professional HTML body matching the dark navy web app theme with horizontal tables & cards
             let htmlBody = `
                 <html>
                 <head>
@@ -600,16 +601,24 @@
                         .header p { color: #94a3b8; margin: 0; font-size: 13px; }
                         .section { padding: 20px 24px; border-bottom: 1px solid #3a506b; }
                         .section h3 { color: #ffb703; font-size: 15px; margin-top: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-                        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 10px; }
-                        .card { background: #0b132b; border: 1px solid #3a506b; border-radius: 10px; padding: 12px; text-align: center; }
-                        .card-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
-                        .card-value { font-size: 16px; font-weight: bold; color: #ffffff; }
-                        .hc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
-                        .hc-card { background: #0b132b; border: 1px solid #3a506b; border-radius: 8px; padding: 8px; text-align: center; }
+                        
+                        /* Horizontal Cards for Metrics */
+                        .metrics-row { display: table; width: 100%; table-layout: fixed; margin-top: 10px; }
+                        .metric-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 12px 8px; text-align: center; border-radius: 8px; }
+                        .metric-card + .metric-card { border-left: none; }
+                        .card-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; display: block; margin-bottom: 4px; }
+                        .card-value { font-size: 15px; font-weight: bold; color: #ffffff; }
+
+                        /* Horizontal Headcount Cards */
+                        .hc-row { display: table; width: 100%; table-layout: fixed; margin-top: 10px; }
+                        .hc-card { display: table-cell; background: #0b132b; border: 1px solid #3a506b; padding: 10px 6px; text-align: center; border-radius: 6px; }
+
                         ul { margin: 0; padding-left: 18px; color: #e2e8f0; font-size: 13px; line-height: 1.6; }
                         li { margin-bottom: 8px; }
+
+                        /* Training Table with Trainer -> Trainee -> Module -> Status */
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-                        th { background: #0b132b; color: #94a3b8; text-align: left; padding: 8px; border: 1px solid #3a506b; }
+                        th { background: #0b132b; color: #94a3b8; text-align: left; padding: 8px; border: 1px solid #3a506b; text-transform: uppercase; font-size: 10px; }
                         td { padding: 8px; border: 1px solid #3a506b; color: #f8fafc; }
                     </style>
                 </head>
@@ -620,47 +629,54 @@
                             <p>Leader Recap & Shift Report — <strong>${leader.name}</strong> (${appData.currentDate})</p>
                         </div>
                         
-                        <!-- Labor & Attendance Metrics -->
+                        <!-- 1. Labor & Attendance Metrics (Horizontal) -->
                         <div class="section">
-                            <h3>Labor & Attendance Metrics</h3>
-                            <div class="grid">
-                                <div class="card"><span class="card-label">Scheduled</span><span class="card-value">${leader.metrics.scheduled.toFixed(1)} hrs</span></div>
-                                <div class="card"><span class="card-label">Actual</span><span class="card-value" style="color: #34d399;">${leader.metrics.actual.toFixed(1)} hrs</span></div>
-                                <div class="card"><span class="card-label">Variance</span><span class="card-value" style="color: #818cf8;">${leader.metrics.variance.toFixed(1)} hrs</span></div>
+                            <h3>1. Shift Attendance & Labor Metrics</h3>
+                            <div class="metrics-row">
+                                <div class="metric-card"><span class="card-label">Scheduled</span><span class="card-value">${leader.metrics.scheduled.toFixed(1)} hrs</span></div>
+                                <div class="metric-card"><span class="card-label">Actual</span><span class="card-value" style="color: #34d399;">${leader.metrics.actual.toFixed(1)} hrs</span></div>
+                                <div class="metric-card"><span class="card-label">Call-In</span><span class="card-value" style="color: #fbbf24;">${leader.metrics.callIn.toFixed(1)} hrs</span></div>
+                                <div class="metric-card"><span class="card-label">Variance</span><span class="card-value" style="color: #818cf8;">${leader.metrics.variance.toFixed(1)} hrs</span></div>
+                                <div class="metric-card"><span class="card-label">Var %</span><span class="card-value" style="color: #818cf8;">${(leader.metrics.variancePct * 100).toFixed(2)}%</span></div>
+                                <div class="metric-card"><span class="card-label">Attendance</span><span class="card-value" style="color: #48cae4;">${(leader.metrics.attendanceRate * 100).toFixed(1)}%</span></div>
+                            </div>
+
+                            <!-- Headcount Breakdown (Horizontal) -->
+                            <div style="margin-top: 15px;">
+                                <span class="card-label" style="font-size: 11px; margin-bottom: 6px;">Cast Member Headcount Breakdown</span>
+                                <div class="hc-row">
+                                    <div class="hc-card"><span class="card-label">Present</span><span class="card-value">${leader.headcount.present}</span></div>
+                                    <div class="hc-card"><span class="card-label">Sick</span><span class="card-value" style="color: #f87171;">${leader.headcount.callSick}</span></div>
+                                    <div class="hc-card"><span class="card-label">FMLA</span><span class="card-value" style="color: #f87171;">${leader.headcount.fmla}</span></div>
+                                    <div class="hc-card"><span class="card-label">ADO</span><span class="card-value" style="color: #fbbf24;">${leader.headcount.ado}</span></div>
+                                    <div class="hc-card"><span class="card-label">ER</span><span class="card-value" style="color: #48cae4;">${leader.headcount.er}</span></div>
+                                    <div class="hc-card"><span class="card-label">ROS</span><span class="card-value" style="color: #48cae4;">${leader.headcount.ros}</span></div>
+                                    <div class="hc-card"><span class="card-label">Late</span><span class="card-value" style="color: #48cae4;">${leader.headcount.late}</span></div>
+                                    <div class="hc-card"><span class="card-label">Total</span><span class="card-value" style="color: #818cf8;">${leader.headcount.totalSched}</span></div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Cast Member Headcount & Attendance Breakdown -->
+                        <!-- 2. Shift Activity Logs -->
                         <div class="section">
-                            <h3>Headcount & Attendance Breakdown</h3>
-                            <div class="hc-grid">
-                                <div class="hc-card"><span class="card-label">Present</span><span class="card-value">${leader.headcount.present}</span></div>
-                                <div class="hc-card"><span class="card-label">Call Sick</span><span class="card-value" style="color: #f87171;">${leader.headcount.callSick}</span></div>
-                                <div class="hc-card"><span class="card-label">FMLA</span><span class="card-value" style="color: #f87171;">${leader.headcount.fmla}</span></div>
-                                <div class="hc-card"><span class="card-label">ADO</span><span class="card-value" style="color: #fbbf24;">${leader.headcount.ado}</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Shift Activity Logs -->
-                        <div class="section">
-                            <h3>Shift Activity Logs</h3>
+                            <h3>2. Leadership End of Shift Logs</h3>
                             <ul>
                                 ${leader.logs.map(l => `<li><strong>${l.leader}:</strong> ${l.detail}</li>`).join('')}
                             </ul>
                         </div>
 
-                        <!-- Training Tracker -->
+                        <!-- 3. Training Tracker (Trainer -> Trainee -> Module -> Status) -->
                         <div class="section">
-                            <h3>Training Tracker</h3>
+                            <h3>3. Training Tracker</h3>
                             <table>
-                                <tr><th>Trainer</th><th>Trainee</th><th>Module</th><th>Status</th></tr>
+                                <tr><th>Trainer</th><th>Trainee</th><th>Training Module</th><th>Status / Assessment</th></tr>
                                 ${leader.training.map(t => `<tr><td>${t.trainer}</td><td>${t.trainee}</td><td>${t.module}</td><td style="color: #fbbf24; font-weight: bold;">${t.assessment}</td></tr>`).join('')}
                             </table>
                         </div>
 
-                        <!-- Specialized Contracts -->
+                        <!-- 4. Specialized Contracts & Status -->
                         <div class="section" style="border-bottom: none;">
-                            <h3>Specialized Contracts & Work Completed</h3>
+                            <h3>4. Specialized Contracts & Work Completed</h3>
                             <ul>
                                 ${leader.contracts.map(c => `<li><strong>${c.name}:</strong> ${c.workDone}</li>`).join('')}
                             </ul>
