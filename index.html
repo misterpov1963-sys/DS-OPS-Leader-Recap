@@ -495,7 +495,6 @@
             l.metrics.actual = parseFloat(document.getElementById('actualLabor').value) || 0.0;
             l.metrics.callIn = parseFloat(document.getElementById('callInFactor').value) || 0.0;
             
-            // Corrected variance formula: (Actual + Call-In) - Scheduled
             l.metrics.variance = Number(((l.metrics.actual + l.metrics.callIn) - l.metrics.scheduled).toFixed(1));
             l.metrics.variancePct = l.metrics.scheduled > 0 ? Number((l.metrics.variance / l.metrics.scheduled).toFixed(4)) : 0.0;
             l.metrics.attendanceRate = l.metrics.scheduled > 0 ? Number(((l.metrics.actual + l.metrics.callIn) / l.metrics.scheduled).toFixed(4)) : 0.0;
@@ -621,6 +620,11 @@
                         ul { margin: 0; padding-left: 18px; color: #e2e8f0; font-size: 13px; line-height: 1.6; }
                         li { margin-bottom: 8px; }
 
+                        /* Stylish Contract Cards */
+                        .contract-card { background: #0b132b; border: 1px solid #3a506b; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+                        .contract-title { font-size: 13px; font-weight: bold; color: #48cae4; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+                        .contract-desc { background: #1c2541; border: 1px solid #3a506b; border-radius: 6px; padding: 10px; font-size: 13px; color: #e2e8f0; line-height: 1.5; }
+
                         /* Training Table: Trainer -> Trainee -> Module -> Status */
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
                         th { background: #0b132b; color: #94a3b8; text-align: left; padding: 8px; border: 1px solid #3a506b; text-transform: uppercase; font-size: 10px; }
@@ -679,12 +683,17 @@
                             </table>
                         </div>
 
-                        <!-- 4. Specialized Contracts & Status -->
+                        <!-- 4. Specialized Contracts & Status (Styled Cards) -->
                         <div class="section" style="border-bottom: none;">
                             <h3>4. Specialized Contracts & Work Completed</h3>
-                            <ul>
-                                ${leader.contracts.map(c => `<li><strong>${c.name}:</strong> ${c.workDone}</li>`).join('')}
-                            </ul>
+                            <div style="margin-top: 10px;">
+                                ${leader.contracts.map(c => `
+                                    <div class="contract-card">
+                                        <div class="contract-title"><i class="fa-solid fa-file-contract"></i> ${c.name}</div>
+                                        <div class="contract-desc">${c.workDone}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
                 </body>
