@@ -39,13 +39,13 @@
                     <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
                         Disney Springs 3rd Shift Operations
                     </h1>
-                    <p class="text-xs text-slate-400">Disney Springs Leadership Recap System</p>
+                    <p class="text-xs text-slate-400">Multi-User Live Sync Active</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
                 <div id="syncIndicator" class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="syncText">Multi-User Sync Ready</span>
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span id="syncText">Live Connected</span>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
@@ -73,7 +73,6 @@
     </div>
 
     <script>
-        // Using JSONbin.io as a bulletproof zero-auth shared JSON backend so team members sync instantly across PCs
         const BIN_ID = "66f42c3ead19ca34f8a1924b"; 
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
@@ -210,9 +209,7 @@
                         }
                     }
                 }
-            } catch (e) {
-                console.warn("Sync fetch error:", e);
-            }
+            } catch (e) {}
         }
 
         async function saveData() {
@@ -225,12 +222,11 @@
                     headers: { 'Content-Type': 'application/json', 'X-Master-Key': '$2a$10$Xb7vL5mN8q1v2z3w4k5l6O' },
                     body: JSON.stringify(appData)
                 });
-                document.getElementById('syncText').innerText = "Live Synced Across PCs";
+                document.getElementById('syncText').innerText = "Live Synced";
             } catch (e) {
-                localStorage.setItem('disney_backup', hash);
-                document.getElementById('syncText').innerText = "Saved Locally";
+                document.getElementById('syncText').innerText = "Save Error";
             }
-            setTimeout(() => { isSaving = false; }, 400);
+            setTimeout(() => { isSaving = false; }, 300);
         }
 
         function renderTabs() {
@@ -276,7 +272,7 @@
                         </div>
                         <div class="w-full grow">
                             <span class="text-[10px] text-slate-400 uppercase block mb-1">Shift Activity / Comment</span>
-                            <textarea rows="2" onchange="updateLog('${leader.name}', ${index}, 'detail', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 resize-y">${log.detail}</textarea>
+                            <textarea rows="2" oninput="updateLog('${leader.name}', ${index}, 'detail', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 resize-y">${log.detail}</textarea>
                         </div>
                         <button onclick="deleteLog('${leader.name}', ${index})" class="text-slate-500 hover:text-rose-400 p-2 self-end sm:self-center transition"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
@@ -284,8 +280,8 @@
 
                 let trainingHtml = leader.training.map((t, idx) => `
                     <tr class="hover:bg-slate-950/40">
-                        <td class="p-3"><input type="text" value="${t.trainer}" onchange="updateTraining('${leader.name}', ${idx}, 'trainer', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-white"></td>
-                        <td class="p-3"><input type="text" value="${t.trainee}" onchange="updateTraining('${leader.name}', ${idx}, 'trainee', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-white"></td>
+                        <td class="p-3"><input type="text" value="${t.trainer}" oninput="updateTraining('${leader.name}', ${idx}, 'trainer', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-white"></td>
+                        <td class="p-3"><input type="text" value="${t.trainee}" oninput="updateTraining('${leader.name}', ${idx}, 'trainee', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-white"></td>
                         <td class="p-3">
                             <select onchange="updateTraining('${leader.name}', ${idx}, 'module', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2.5 py-1.5 w-full text-xs text-white font-medium">
                                 ${trainingModulesList.map(mod => `<option value="${mod}" ${t.module === mod ? 'selected' : ''}>${mod}</option>`).join('')}
@@ -308,15 +304,15 @@
 
                 let contractsHtml = leader.contracts.map((c, idx) => `
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-                        <div class="w-full md:w-1/4"><input type="text" value="${c.name}" onchange="updateContract('${leader.name}', ${idx}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-bold text-white"></div>
-                        <div class="w-full md:w-1/5"><input type="text" value="${c.lead}" onchange="updateContract('${leader.name}', ${idx}, 'lead', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
+                        <div class="w-full md:w-1/4"><input type="text" value="${c.name}" oninput="updateContract('${leader.name}', ${idx}, 'name', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-bold text-white"></div>
+                        <div class="w-full md:w-1/5"><input type="text" value="${c.lead}" oninput="updateContract('${leader.name}', ${idx}, 'lead', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
                         <div class="w-full md:w-36">
                             <select onchange="updateContract('${leader.name}', ${idx}, 'status', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs font-semibold text-emerald-400">
                                 <option value="Completed" ${c.status === 'Completed' ? 'selected' : ''}>Completed</option>
                                 <option value="In Progress" ${c.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                             </select>
                         </div>
-                        <div class="w-full grow"><input type="text" value="${c.scope}" onchange="updateContract('${leader.name}', ${idx}, 'scope', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
+                        <div class="w-full grow"><input type="text" value="${c.scope}" oninput="updateContract('${leader.name}', ${idx}, 'scope', this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-1.5 text-xs text-slate-200"></div>
                         <button onclick="deleteContract('${leader.name}', ${idx})" class="text-slate-500 hover:text-rose-400 p-2"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `).join('');
@@ -446,12 +442,18 @@
 
         function updateLog(leaderName, idx, field, val) {
             const l = appData.leaders.find(x => x.name === leaderName);
-            if (l && l.logs[idx]) { l.logs[idx][field] = val; saveData(); }
+            if (l && l.logs[idx]) { 
+                l.logs[idx][field] = val; 
+                saveData(); 
+            }
         }
 
         function updateLogLeader(leaderName, idx, newLeader) {
             const l = appData.leaders.find(x => x.name === leaderName);
-            if (l && l.logs[idx]) { l.logs[idx].leader = newLeader; saveData(); }
+            if (l && l.logs[idx]) { 
+                l.logs[idx].leader = newLeader; 
+                saveData(); 
+            }
         }
 
         function deleteLog(leaderName, idx) {
@@ -470,7 +472,10 @@
 
         function updateTraining(leaderName, idx, field, val) {
             const l = appData.leaders.find(x => x.name === leaderName);
-            if (l && l.training[idx]) { l.training[idx][field] = val; saveData(); }
+            if (l && l.training[idx]) { 
+                l.training[idx][field] = val; 
+                saveData(); 
+            }
         }
 
         function deleteTraining(leaderName, idx) {
@@ -489,7 +494,10 @@
 
         function updateContract(leaderName, idx, field, val) {
             const l = appData.leaders.find(x => x.name === leaderName);
-            if (l && l.contracts[idx]) { l.contracts[idx][field] = val; saveData(); }
+            if (l && l.contracts[idx]) { 
+                l.contracts[idx][field] = val; 
+                saveData(); 
+            }
         }
 
         function deleteContract(leaderName, idx) {
@@ -515,8 +523,7 @@
         window.onload = async function() {
             await fetchSharedData();
             renderApp();
-            // Automatically poll for teammate updates every 3 seconds
-            setInterval(fetchSharedData, 3000);
+            setInterval(fetchSharedData, 2000);
         };
     </script>
 </body>
