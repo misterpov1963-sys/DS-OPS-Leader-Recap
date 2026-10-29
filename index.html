@@ -525,8 +525,8 @@
         }
 
         function recalcMetrics(leaderName) {
-            saveData();
-            renderApp();
+            syncMetrics(leaderName);
+            showToast("Metrics recalculated successfully!");
         }
 
         function addLogEntry(leaderName) {
