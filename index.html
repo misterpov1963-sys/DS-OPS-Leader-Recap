@@ -39,13 +39,13 @@
                     <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 via-indigo-300 to-amber-300 bg-clip-text text-transparent">
                         Disney Springs 3rd Shift Operations
                     </h1>
-                    <p class="text-xs text-slate-400">Leadership Recap & Management System</p>
+                    <p class="text-xs text-slate-400">Multi-User Cloud Sync Active</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-3">
-                <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span>System Ready</span>
+                <div id="syncIndicator" class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-cloud text-emerald-400 animate-pulse"></i> <span id="syncText">Live Cloud Connected</span>
                 </div>
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
@@ -69,10 +69,12 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Saved successfully!</span>
+        <span id="toastMessage" class="text-sm font-medium">Synced successfully!</span>
     </div>
 
     <script>
+        const DATABASE_URL = "https://ds-ops-leader-recap-default-rtdb.firebaseio.com/disney_3rd_shift_recap.json";
+
         let appData = {
             currentDate: "2026-10-28",
             activeTab: "Joint Leadership Recap",
@@ -187,10 +189,45 @@
         const activeLeadersList = ["Henry Powell", "Zoroaya Hernandez", "Jonathan Jimenez", "Cheryl Moore", "Sabine Bade", "Roxanne Canales", "Michael Rivera"];
         const trainingModulesList = ["Area Washdown", "Pressure washing", "Night 1 Facilitation", "Trainer on Duty"];
 
-        function saveData() {
+        let isSyncing = false;
+        let lastRenderState = "";
+
+        async function fetchCloudData() {
+            if (isSyncing) return;
             try {
-                localStorage.setItem('disney_3rd_shift_recap', JSON.stringify(appData));
-            } catch(e) {}
+                const response = await fetch(DATABASE_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data) {
+                        const serialized = JSON.stringify(data);
+                        // Only re-render if remote data differs from current state to prevent overwriting user typing
+                        if (serialized !== lastRenderState) {
+                            appData = data;
+                            lastRenderState = serialized;
+                            renderApp();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn("Cloud fetch warning:", e);
+            }
+        }
+
+        async function saveData() {
+            isSyncing = true;
+            const serialized = JSON.stringify(appData);
+            lastRenderState = serialized;
+            try {
+                await fetch(DATABASE_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: serialized
+                });
+                document.getElementById('syncText').innerText = "Live Cloud Connected";
+            } catch (e) {
+                document.getElementById('syncText').innerText = "Local Mode Active";
+            }
+            setTimeout(() => { isSyncing = false; }, 500);
         }
 
         function renderTabs() {
@@ -209,6 +246,7 @@
                 btn.onclick = () => {
                     appData.activeTab = leader.name;
                     renderApp();
+                    saveData();
                 };
                 container.appendChild(btn);
             });
@@ -250,11 +288,11 @@
                                 ${trainingModulesList.map(mod => `<option value="${mod}" ${t.module === mod ? 'selected' : ''}>${mod}</option>`).join('')}
                             </select>
                         </td>
-                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 1</label><input type="checkbox" ${t.n1 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n1', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
-                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 2</label><input type="checkbox" ${t.n2 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n2', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
-                        <td class="p-3 text-center"><label class="text-[11px] text-slate-400 block mb-1">Night 3</label><input type="checkbox" ${t.n3 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n3', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
+                        <td class="p-3 text-center"><label class="text-[10px] text-slate-400 block">Night 1</label><input type="checkbox" ${t.n1 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n1', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
+                        <td class="p-3 text-center"><label class="text-[10px] text-slate-400 block">Night 2</label><input type="checkbox" ${t.n2 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n2', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
+                        <td class="p-3 text-center"><label class="text-[10px] text-slate-400 block">Night 3</label><input type="checkbox" ${t.n3 ? 'checked' : ''} onchange="updateTraining('${leader.name}', ${idx}, 'n3', this.checked ? 1 : 0)" class="w-4 h-4 rounded bg-slate-950 border-slate-700 text-purple-600 cursor-pointer"></td>
                         <td class="p-3">
-                            <label class="text-[11px] text-slate-400 block mb-1">Assessment</label>
+                            <label class="text-[10px] text-slate-400 block">Assessment</label>
                             <select onchange="updateTraining('${leader.name}', ${idx}, 'assessment', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 w-full text-xs font-semibold text-amber-400">
                                 <option value="Pending Evaluation" ${t.assessment === 'Pending Evaluation' ? 'selected' : ''}>Pending Evaluation</option>
                                 <option value="Passed - Certified" ${t.assessment === 'Passed - Certified' ? 'selected' : ''}>Passed - Certified</option>
@@ -471,12 +509,11 @@
             a.click();
         }
 
-        window.onload = function() {
-            const saved = localStorage.getItem('disney_3rd_shift_recap');
-            if (saved) {
-                try { appData = JSON.parse(saved); } catch(e) {}
-            }
+        window.onload = async function() {
+            await fetchCloudData();
             renderApp();
+            // Automatically sync updates from teammates every 3 seconds
+            setInterval(fetchCloudData, 3000);
         };
     </script>
 </body>
