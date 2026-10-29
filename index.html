@@ -43,16 +43,19 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-400"></i> <span>Locally Saved & Secure</span>
-                </div>
+            <div class="flex items-center gap-3 flex-wrap">
                 <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex items-center gap-2 text-sm">
                     <i class="fa-regular fa-calendar text-cyan-400"></i>
                     <span id="currentDateDisplay" class="font-medium text-slate-200"></span>
                 </div>
-                <button onclick="downloadEmlFile()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
-                    <i class="fa-solid fa-file-arrow-down"></i> Download .EML File
+                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save a backup file of your current data">
+                    <i class="fa-solid fa-download"></i> Save Backup
+                </button>
+                <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load a saved backup file">
+                    <i class="fa-solid fa-upload"></i> Load Backup <input type="file" id="importFile" onchange="importBackup(event)" class="hidden" accept=".json">
+                </label>
+                <button onclick="downloadEmlFile()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+                    <i class="fa-solid fa-file-arrow-down"></i> .EML File
                 </button>
             </div>
         </div>
@@ -69,11 +72,11 @@
     <!-- Notification Toast -->
     <div id="toast" class="fixed bottom-6 right-6 bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 transition-all duration-300 z-50">
         <i class="fa-solid fa-circle-check text-lg"></i>
-        <span id="toastMessage" class="text-sm font-medium">Saved locally!</span>
+        <span id="toastMessage" class="text-sm font-medium">Saved successfully!</span>
     </div>
 
     <script>
-        const STORAGE_KEY = "disney_3rd_shift_recap_data_v2";
+        const STORAGE_KEY = "disney_3rd_shift_recap_permanent_v3";
 
         const defaultData = {
             currentDate: new Date().toISOString().split('T')[0],
@@ -197,16 +200,45 @@
         function saveData() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-                showToast();
+                showToast("Saved locally!");
             } catch (e) {}
         }
 
-        function showToast() {
+        function exportBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Shift_Recap_Backup_${appData.currentDate}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Backup downloaded!");
+        }
+
+        function importBackup(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        appData = JSON.parse(e.target.result);
+                        saveData();
+                        renderApp();
+                        showToast("Backup loaded successfully!");
+                    } catch (error) {
+                        alert("Invalid backup file.");
+                    }
+                };
+            }
+        }
+
+        function showToast(msg) {
             const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
             toast.classList.remove('translate-y-24', 'opacity-0');
             setTimeout(() => {
                 toast.classList.add('translate-y-24', 'opacity-0');
-            }, 1500);
+            }, 1800);
         }
 
         const activeLeadersList = ["Henry Powell", "Zoroaya Hernandez", "Jonathan Jimenez", "Cheryl Moore", "Sabine Bade", "Roxanne Canales", "Michael Rivera"];
