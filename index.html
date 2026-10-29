@@ -589,7 +589,6 @@
             const leader = appData.leaders.find(l => l.name === appData.activeTab) || appData.leaders[0];
             const subject = `3rd Shift Custodial Operations Recap — ${appData.currentDate} (${leader.name})`;
             
-            // Styled, colorful professional HTML body matching the dark navy web app theme
             let htmlBody = `
                 <html>
                 <head>
@@ -641,7 +640,8 @@
             `;
 
             const boundary = "----=_Part_" + Date.now();
-            const emlContent = `To: Team <recap@disney.com>\n` +
+            // Added explicit To: header at the top so Outlook populates recipient lines correctly
+            const emlContent = `To: Leadership Team <leadership@disney.com>\n` +
                              `Subject: ${subject}\n` +
                              `MIME-Version: 1.0\n` +
                              `Content-Type: multipart/alternative; boundary="${boundary}"\n\n` +
@@ -663,7 +663,7 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
-            showToast("Styled EML File downloaded!");
+            showToast("EML File downloaded with To: field!");
         }
 
         window.onload = function() {
