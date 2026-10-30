@@ -54,7 +54,7 @@
                 <button onclick="pasteTeamData()" class="bg-teal-600 hover:bg-teal-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-teal-600/20" title="Paste shift data from teammate">
                     <i class="fa-solid fa-paste"></i> Paste Team Data
                 </button>
-                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save backup file with timestamp">
+                <button onclick="exportBackup()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-lg shadow-emerald-600/20" title="Save backup file with timestamp first">
                     <i class="fa-solid fa-download"></i> Save Backup
                 </button>
                 <label class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-600/20" title="Load backup file">
@@ -248,7 +248,8 @@
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0];
             const timeStr = String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
-            const filename = `Shift_Recap_${dateStr}_${timeStr}.json`;
+            // Timestamp first so it's instantly visible at a glance
+            const filename = `${dateStr}_${timeStr}_Shift_Recap.json`;
 
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
             const downloadAnchor = document.createElement('a');
